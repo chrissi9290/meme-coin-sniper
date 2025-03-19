@@ -1,9 +1,11 @@
-const { WalletAdapterNetwork } = solanaWalletAdapterBase;
 const { PhantomWalletAdapter } = solanaWalletAdapterWallets;
-const { Wallets } = solanaWalletAdapter;
-const network = WalletAdapterNetwork.Mainnet;
 
 const wallet = new PhantomWalletAdapter();
+
+// Check if Phantom installed
+if (!wallet.ready) {
+  alert("Please install Phantom Wallet extension!");
+}
 
 document.getElementById('connectWallet').addEventListener('click', async () => {
   try {
@@ -13,6 +15,5 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
     console.log("Wallet connected:", publicKey);
   } catch (err) {
     console.error('Wallet connection failed:', err);
-    alert("Wallet connection failed. Make sure Phantom is installed!");
-  }
+    alert("Wallet connection failed!");
 });
