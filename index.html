@@ -20,6 +20,7 @@
       </ul>
     </nav>
     <button id="connectWallet">Connect Wallet</button>
+    <span id="walletAddress"></span>
   </header>
 
   <main>
@@ -36,7 +37,6 @@
           </tr>
         </thead>
         <tbody id="coinList">
-          <!-- Coins will be loaded here -->
           <tr>
             <td>Sample Coin</td>
             <td>SMP</td>
@@ -51,7 +51,6 @@
     <section id="chart">
       <h2>Price Chart</h2>
       <div id="chartContainer">
-        <!-- Chart will go here -->
         <p>Coming soon...</p>
       </div>
     </section>
@@ -61,6 +60,11 @@
   <footer>
     <p>&copy; 2025 MemeCoin Sniper</p>
   </footer>
+
+  <!-- Wallet Adapter -->
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@solana/wallet-adapter-wallets/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@solana/wallet-adapter-base/lib/index.iife.js"></script>
 
   <script src="js/main.js"></script>
 </body>
