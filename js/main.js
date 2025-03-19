@@ -120,7 +120,7 @@ function startAutoSniper() {
   setInterval(() => {
     if (autoSniperEnabled) {
       console.log("Auto-Sniper scanning...");
-      // Hier später Pump.fun API Abfrage & Auto-Buy integrieren!
+      // Pump.fun Integration Point
     }
   }, 10000);
 }
