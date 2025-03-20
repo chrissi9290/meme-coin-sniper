@@ -1,19 +1,19 @@
+console.log('Prüfe SolanaWeb3:', window.SolanaWeb3);
+
 // Globale Variablen
 let walletConnected = false;
 let publicKey = null;
 let connection = null;
-let keypair = null; // Speichert die generierte Wallet
+let keypair = null;
 
-// Neue Wallet erstellen
 document.getElementById('createWallet').addEventListener('click', () => {
     if (!window.SolanaWeb3) {
-        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Überprüfe die lokale Datei!';
-        console.error('SolanaWeb3 nicht definiert. Datei:', 'solana-web3.js');
+        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Ist solana-web3.js hochgeladen?';
+        console.error('SolanaWeb3 nicht definiert');
         return;
     }
 
     try {
-        // Generiere ein neues Keypair
         keypair = window.SolanaWeb3.Keypair.generate();
         publicKey = keypair.publicKey.toString();
         const privateKey = Buffer.from(keypair.secretKey).toString('hex');
@@ -26,7 +26,6 @@ document.getElementById('createWallet').addEventListener('click', () => {
         `;
         walletConnected = true;
 
-        // Verbindung zur Blockchain herstellen
         connection = new window.SolanaWeb3.Connection(window.SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
         connection.getBalance(keypair.publicKey).then(balance => {
             document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / window.SolanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
@@ -39,7 +38,6 @@ document.getElementById('createWallet').addEventListener('click', () => {
     }
 });
 
-// Bestehende Wallet verbinden (z. B. Phantom)
 document.getElementById('connectWallet').addEventListener('click', async () => {
     if (!window.solana || !window.solana.isPhantom) {
         document.getElementById('walletInfo').innerText = 'Phantom Wallet nicht gefunden. Bitte installiere die Erweiterung!';
@@ -47,8 +45,8 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
     }
 
     if (!window.SolanaWeb3) {
-        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Überprüfe die lokale Datei!';
-        console.error('SolanaWeb3 nicht definiert. Datei:', 'solana-web3.js');
+        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Ist solana-web3.js hochgeladen?';
+        console.error('SolanaWeb3 nicht definiert');
         return;
     }
 
@@ -58,7 +56,7 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
         publicKey = provider.publicKey.toString();
         document.getElementById('walletInfo').innerText = `Verbunden mit Wallet: ${publicKey}`;
         walletConnected = true;
-        keypair = null; // Kein Keypair bei Phantom-Verbindung
+        keypair = null;
 
         connection = new window.SolanaWeb3.Connection(window.SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
         const balance = await connection.getBalance(new window.SolanaWeb3.PublicKey(publicKey));
@@ -69,7 +67,6 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
     }
 });
 
-// Token-Liste von DEXscreener abrufen (mit Fallback)
 async function fetchTokens() {
     const tokenList = document.getElementById('tokenList');
     tokenList.innerHTML = 'Lade Token...';
@@ -119,7 +116,6 @@ function selectToken(address) {
 
 fetchTokens();
 
-// Platzhalter für Handelsfunktionen
 document.getElementById('buyButton').addEventListener('click', () => {
     if (!walletConnected) {
         alert('Bitte erst eine Wallet erstellen oder verbinden!');
@@ -137,7 +133,5 @@ document.getElementById('sellButton').addEventListener('click', () => {
     }
     const tokenAddress = document.getElementById('tokenAddress').value;
     const amount = document.getElementById('amount').value;
-    document.getElementById('tradeResult').innerText = `Verkauf von ${amount} SOL für Token ${tokenAddress} wird vorbereitet (noch nicht implementiert)`;
-});'amount').value;
     document.getElementById('tradeResult').innerText = `Verkauf von ${amount} SOL für Token ${tokenAddress} wird vorbereitet (noch nicht implementiert)`;
 });
