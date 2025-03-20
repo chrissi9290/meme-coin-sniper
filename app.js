@@ -16,9 +16,10 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
         document.getElementById('walletInfo').innerText = `Verbunden mit Wallet: ${publicKey}`;
         walletConnected = true;
 
-        connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-        const balance = await connection.getBalance(new solanaWeb3.PublicKey(publicKey));
-        document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
+        // Verwende SolanaWeb3 statt solanaWeb3
+        connection = new SolanaWeb3.Connection(SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+        const balance = await connection.getBalance(new SolanaWeb3.PublicKey(publicKey));
+        document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / SolanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
     } catch (err) {
         console.error('Wallet-Verbindungsfehler:', err);
         document.getElementById('walletInfo').innerText = `Fehler bei der Wallet-Verbindung: ${err.message}`;
