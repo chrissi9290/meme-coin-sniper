@@ -16,13 +16,24 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
         document.getElementById('walletInfo').innerText = `Verbunden mit Wallet: ${publicKey}`;
         walletConnected = true;
 
-        // Verwende SolanaWeb3 statt solanaWeb3
-        connection = new SolanaWeb3.Connection(SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-        const balance = await connection.getBalance(new SolanaWeb3.PublicKey(publicKey));
-        document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / SolanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
-    } catch (err) {
-        console.error('Wallet-Verbindungsfehler:', err);
-        document.getElementById('walletInfo').innerText = `Fehler bei der Wallet-Verbindung: ${err.message}`;
+      // Wallet-Verbindung
+document.getElementById('connectWallet').addEventListener('click', async () => {
+    if (window.solana) {
+        try {
+            const provider = window.solana;
+            const response = await provider.connect();
+            const publicKey = response.publicKey.toString();
+            document.getElementById('walletInfo').innerText = `Connected to wallet: ${publicKey}`;
+            const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+            const balance = await connection.getBalance(new solanaWeb3.PublicKey(publicKey));
+            document.getElementById('balance').innerText = `SOL Balance: ${(balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
+        } catch (err) {
+            console.error(err);
+        }
+    } else {
+        document.getElementById('walletInfo').innerText = 'No Solana wallet found';
+    }
+});
     }
 });
 
