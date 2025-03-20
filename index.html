@@ -4,19 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meme Coin Trader</title>
+    <!-- Solana Web3.js einbinden -->
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.75.0/dist/index.min.js"></script>
+    <!-- Raydium SDK einbinden -->
+    <script src="https://cdn.jsdelivr.net/npm/@raydium-io/raydium-sdk@1.3.1-beta.58/dist/index.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
     <h1>Meme Coin Trader</h1>
     <button id="connectButton">Wallet verbinden</button>
+    <button id="swapButton" disabled>0.01 SOL zu USDC tauschen</button>
     <div id="status"></div>
+
     <script>
-        document.getElementById('connectButton').addEventListener('click', async () => {
+        // Globale Variablen
+        let wallet = null;
+        let connection = null;
+
+        // DOM-Elemente
+        const connectButton = document.getElementById('connectButton');
+        const swapButton = document.getElementById('swapButton');
+        const statusDiv = document.getElementById('status');
+
+        // Wallet-Verbindung
+        connectButton.addEventListener('click', async () => {
             if (window.solana) {
-                const solana = window.solana;
-                const response = await solana.connect();
-                document.getElementById('status').innerText = `Verbunden mit Wallet: ${response.publicKey.toString()}`;
+                try {
+                    wallet = window.solana;
+                    const response = await wallet.connect();
+                    statusDiv.innerText = `Verbunden mit Wallet: ${response.publicKey.toString()}`;
+                    connectButton.disabled = true; // Button deaktivieren nach Verbindung
+                    swapButton.disabled = false; // Swap-Button aktivieren
+                    // Verbindung zur Solana-Blockchain herstellen (Devnet für Tests)
+                    connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+                } catch (error) {
+                    statusDiv.innerText = 'Fehler beim Verbinden mit dem Wallet';
+                }
             } else {
                 alert('Bitte installiere ein Solana-Wallet wie Phantom');
+            }
+        });
+
+        // Swap-Funktionalität
+        swapButton.addEventListener('click', async () => {
+            if (!wallet || !connection) {
+                statusDiv.innerText = 'Bitte zuerst das Wallet verbinden';
+                return;
+            }
+            try {
+                // Raydium SDK initialisieren
+                const raydium = await Raydium.load(connection);
+                // Swap-Transaktion erstellen
+                const swapTransaction = await raydium.swap.swapV2({
+                    inputMint: 'So11111111111111111111111111111111111111112', // SOL
+                    outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+                    amount: 10000000, // 0.01 SOL in Lamports
+                    slippage: 0.5,
+                    userPublicKey: wallet.publicKey,
+                    userTokenAccounts: [],
+                    wrapSOL: true,
+                });
+                // Transaktion signieren
+                const signedTransaction = await wallet.signTransaction(swapTransaction);
+                // Transaktion senden
+                const txid = await connection.sendRawTransaction(signedTransaction.serialize());
+                statusDiv.innerText = `Transaktion gesendet: ${txid}`;
+                // Bestätigung abwarten
+                const confirmation = await connection.confirmTransaction(txid, 'confirmed');
+                statusDiv.innerText = `Transaktion bestätigt: ${confirmation.value.err ? 'Fehlgeschlagen' : 'Erfolgreich'}`;
+            } catch (error) {
+                statusDiv.innerText = `Fehler beim Swap: ${error.message}`;
             }
         });
     </script>
