@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meme Coin Trading on Solana</title>
+    <title>Meme Coin Sniper</title>
     <!-- Solana Web3.js -->
     <script src="https://unpkg.com/@solana/web3.js@1.100.0/lib/index.iife.js"></script>
-    <!-- Raydium SDK (UMD-Version für Browser) -->
+    <!-- Raydium SDK -->
     <script src="https://unpkg.com/@raydium-io/raydium-sdk@1.3.1-beta.58/dist/index.umd.js"></script>
     <!-- Eigene JS-Datei -->
     <script src="app.js" defer></script>
@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <h1>Meme Coin Trading</h1>
+    <h1>Meme Coin Sniper</h1>
     
     <!-- Wallet-Bereich -->
     <section>
@@ -38,8 +38,8 @@
         <div id="tradingArea">
             <input type="text" id="tokenAddress" placeholder="Token-Adresse eingeben">
             <input type="number" id="amount" placeholder="Menge in SOL">
-            <button id="buyButton">Kaufen</button>
-            <button id="sellButton">Verkaufen</button>
+            <button id="buyButton">Kaufen (Raydium)</button>
+            <button id="sellButton">Verkaufen (Raydium)</button>
             <div id="tradeResult"></div>
         </div>
     </section>
