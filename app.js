@@ -1,3 +1,6 @@
+// Debugging: Prüfe, ob SolanaWeb3 verfügbar ist
+console.log('SolanaWeb3 verfügbar:', typeof window.SolanaWeb3);
+
 // Globale Variablen
 let walletConnected = false;
 let publicKey = null;
@@ -9,6 +12,12 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
         return;
     }
 
+    if (!window.SolanaWeb3) {
+        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Überprüfe den CDN-Link!';
+        console.error('SolanaWeb3 nicht definiert. CDN-Link:', 'https://unpkg.com/@solana/web3.js@1.100.0/lib/index.iife.js');
+        return;
+    }
+
     try {
         const provider = window.solana;
         await provider.connect();
@@ -16,7 +25,6 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
         document.getElementById('walletInfo').innerText = `Verbunden mit Wallet: ${publicKey}`;
         walletConnected = true;
 
-        // Verwende SolanaWeb3
         connection = new SolanaWeb3.Connection(SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
         const balance = await connection.getBalance(new SolanaWeb3.PublicKey(publicKey));
         document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / SolanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
@@ -32,7 +40,6 @@ async function fetchTokens() {
     tokenList.innerHTML = 'Lade Token...';
 
     try {
-        // Korrigierter DEXscreener-Endpoint (siehe unten)
         const response = await fetch('https://api.dexscreener.com/latest/dex/search?q=SOL');
         if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
         const data = await response.json();
