@@ -1,52 +1,81 @@
-// Gebühren verwalten
-let totalFees = parseFloat(localStorage.getItem('totalFees')) || 0;
-document.getElementById('total-fees').textContent = totalFees.toFixed(2);
+// Pump.fun Daten laden (via PumpPortal REST API)
+async function loadPumpfunTokens() {
+    try {
+        const response = await fetch('https://pumpportal.fun/api/data/created-tokens');
+        const tokens = await response.json();
+        const latestTokens = tokens.slice(0, 5); // Nur die neuesten 5 Tokens
+        const container = document.getElementById('pumpfun-tokens');
+        container.innerHTML = '';
 
-function chargeFee() {
-    const fee = 0.01; // 0,01 MEMEFEE pro Klick
-    totalFees += fee;
-    localStorage.setItem('totalFees', totalFees);
-    document.getElementById('total-fees').textContent = totalFees.toFixed(2);
+        latestTokens.forEach(token => {
+            const card = document.createElement('div');
+            card.className = 'token-card';
+            card.innerHTML = `
+                <p>${token.name} (${token.symbol})</p>
+                <p>Adresse: ${token.mint.slice(0, 8)}...</p>
+                <a href="https://pump.fun/${token.mint}" target="_blank">Handeln</a>
+            `;
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Fehler beim Laden der Pump.fun-Daten:', error);
+        document.getElementById('pumpfun-tokens').innerHTML = '<p>Daten konnten nicht geladen werden.</p>';
+    }
 }
 
 // Raydium Daten laden
-fetch('https://api.raydium.io/v2/ammV3/ammPools')
-    .then(response => response.json())
-    .then(data => {
-        const pools = data.data.slice(0, 10); // Nur die ersten 10 Pools
+async function loadRaydiumPools() {
+    try {
+        const response = await fetch('https://api.raydium.io/v2/ammV3/ammPools');
+        const data = await response.json();
+        const pools = data.slice(0, 10); // Nur die ersten 10 Pools
         const container = document.getElementById('raydium-pools');
+        container.innerHTML = '';
+
         pools.forEach(pool => {
             const card = document.createElement('div');
             card.className = 'token-card';
             card.innerHTML = `
-                <p>${pool.baseMint} / ${pool.quoteMint}</p>
-                <p>Preis: ${pool.price.toFixed(6)}</p>
-                <a href="https://raydium.io/swap/?inputMint=${pool.baseMint}&outputMint=${pool.quoteMint}" target="_blank" onclick="chargeFee()">Handeln</a>
+                <p>${pool.baseMint.slice(0, 8)}... / ${pool.quoteMint.slice(0, 8)}...</p>
+                <p>Preis: ${pool.price.toFixed(6)} SOL</p>
+                <a href="https://raydium.io/swap/?inputMint=${pool.baseMint}&outputMint=${pool.quoteMint}" target="_blank">Handeln</a>
             `;
             container.appendChild(card);
         });
-    })
-    .catch(error => console.error('Fehler beim Laden von Raydium:', error));
+    } catch (error) {
+        console.error('Fehler beim Laden der Raydium-Daten:', error);
+        document.getElementById('raydium-pools').innerHTML = '<p>Daten konnten nicht geladen werden.</p>';
+    }
+}
 
-// DEXscreener Daten laden (angenommene API)
-fetch('https://api.dexscreener.com/latest/dex/pairs/solana')
-    .then(response => response.json())
-    .then(data => {
-        const pairs = data.pairs.slice(0, 10); // Nur die ersten 10 Paare
-        const container = document.getElementById('dexscreener-pairs');
-        pairs.forEach(pair => {
+// DEXscreener Daten laden (Hypothetisch, API muss angepasst werden)
+async function loadDexscreenerTokens() {
+    try {
+        const response = await fetch('https://api.dexscreener.com/latest/dex/search?q=solana');
+        const data = await response.json();
+        const tokens = data.pairs.slice(0, 5); // Nur die ersten 5 Tokens
+        const container = document.getElementById('dexscreener-tokens');
+        container.innerHTML = '';
+
+        tokens.forEach(token => {
             const card = document.createElement('div');
             card.className = 'token-card';
             card.innerHTML = `
-                <p>${pair.baseToken.symbol} / ${pair.quoteToken.symbol}</p>
-                <p>Preis: $${pair.priceUsd}</p>
-                <a href="${pair.url}" target="_blank" onclick="chargeFee()">Ansehen</a>
+                <p>${token.baseToken.symbol} / ${token.quoteToken.symbol}</p>
+                <p>Preis: $${token.priceUsd}</p>
+                <a href="${token.url}" target="_blank">Details</a>
             `;
             container.appendChild(card);
         });
-    })
-    .catch(error => console.error('Fehler beim Laden von DEXscreener:', error));
-            container.appendChild(card);
-        });
-    })
-    .catch(error => console.error('Fehler beim Laden von DEXscreener:', error));
+    } catch (error) {
+        console.error('Fehler beim Laden der DEXscreener-Daten:', error);
+        document.getElementById('dexscreener-tokens').innerHTML = '<p>Daten konnten nicht geladen werden. API muss überprüft werden.</p>';
+    }
+}
+
+// Funktionen beim Laden der Seite ausführen
+window.onload = () => {
+    loadPumpfunTokens();
+    loadRaydiumPools();
+    loadDexscreenerTokens();
+};
