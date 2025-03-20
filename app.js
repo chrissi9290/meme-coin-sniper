@@ -1,4 +1,4 @@
-// Wallet-Verbindung
+// Globale Variablen
 let walletConnected = false;
 let publicKey = null;
 let connection = null;
@@ -12,7 +12,6 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
             document.getElementById('walletInfo').innerText = `Verbunden mit Wallet: ${publicKey}`;
             walletConnected = true;
 
-            // Verbindung zur Solana-Blockchain herstellen
             connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
             const balance = await connection.getBalance(new solanaWeb3.PublicKey(publicKey));
             document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
@@ -33,7 +32,6 @@ async function fetchTokens() {
         const tokenList = document.getElementById('tokenList');
         tokenList.innerHTML = '';
 
-        // Beispiel: Nur die ersten 5 Token anzeigen
         data.pairs.slice(0, 5).forEach(token => {
             const tokenDiv = document.createElement('div');
             tokenDiv.className = 'token';
@@ -41,6 +39,7 @@ async function fetchTokens() {
                 <strong>${token.baseToken.symbol}</strong> 
                 - Preis: $${token.priceUsd} 
                 - Adresse: ${token.baseToken.address}
+                <button onclick="selectToken('${token.baseToken.address}')">Auswählen</button>
             `;
             tokenList.appendChild(tokenDiv);
         });
@@ -50,26 +49,70 @@ async function fetchTokens() {
     }
 }
 
-// Token-Liste beim Laden der Seite abrufen
+// Token-Adresse in Handelsbereich einfügen
+function selectToken(address) {
+    document.getElementById('tokenAddress').value = address;
+}
+
+// Token-Liste laden
 fetchTokens();
 
-// Platzhalter für Handelsfunktionen
-document.getElementById('buyButton').addEventListener('click', () => {
-    if (!walletConnected) {
+// Raydium Swap-Funktion (vereinfacht)
+async function performRaydiumSwap(isBuy, tokenAddress, amountSol) {
+    if (!walletConnected || !connection || !publicKey) {
         alert('Bitte erst die Wallet verbinden!');
         return;
     }
+
+    try {
+        // Beispiel: SOL zu Token tauschen (kaufen)
+        const amountLamports = amountSol * solanaWeb3.LAMPORTS_PER_SOL;
+        const tokenMint = new solanaWeb3.PublicKey(tokenAddress);
+        const wallet = new solanaWeb3.PublicKey(publicKey);
+
+        // Raydium-Setup (vereinfacht, Pool-ID müsste spezifisch sein)
+        const raydium = window.raydium; // Von Raydium SDK geladen
+        const tx = new solanaWeb3.Transaction();
+
+        // Dummy-Beispiel: Hier müssten echte Pool-Daten und Swap-Instruction hinzugefügt werden
+        // Dies ist ein Platzhalter – echte Implementierung benötigt Pool-Details
+        tx.add(
+            solanaWeb3.SystemProgram.transfer({
+                fromPubkey: wallet,
+                toPubkey: wallet, // Dummy, sollte Pool-Adresse sein
+                lamports: amountLamports
+            })
+        );
+
+        // Transaktion signieren und senden
+        const signedTx = await window.solana.signTransaction(tx);
+        const txId = await connection.sendRawTransaction(signedTx.serialize());
+        
+        document.getElementById('tradeResult').innerText = `${isBuy ? 'Kauf' : 'Verkauf'} wird ausgeführt. TxID: ${txId}`;
+    } catch (err) {
+        console.error(err);
+        document.getElementById('tradeResult').innerText = `Fehler: ${err.message}`;
+    }
+}
+
+// Kauf-Button
+document.getElementById('buyButton').addEventListener('click', async () => {
     const tokenAddress = document.getElementById('tokenAddress').value;
-    const amount = document.getElementById('amount').value;
-    document.getElementById('tradeResult').innerText = `Kauf von ${amount} SOL für Token ${tokenAddress} wird vorbereitet (noch nicht implementiert)`;
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (!tokenAddress || !amount) {
+        alert('Bitte Token-Adresse und Menge eingeben!');
+        return;
+    }
+    await performRaydiumSwap(true, tokenAddress, amount);
 });
 
-document.getElementById('sellButton').addEventListener('click', () => {
-    if (!walletConnected) {
-        alert('Bitte erst die Wallet verbinden!');
+// Verkauf-Button
+document.getElementById('sellButton').addEventListener('click', async () => {
+    const tokenAddress = document.getElementById('tokenAddress').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (!tokenAddress || !amount) {
+        alert('Bitte Token-Adresse und Menge eingeben!');
         return;
     }
-    const tokenAddress = document.getElementById('tokenAddress').value;
-    const amount = document.getElementById('amount').value;
-    document.getElementById('tradeResult').innerText = `Verkauf von ${amount} SOL für Token ${tokenAddress} wird vorbereitet (noch nicht implementiert)`;
+    await performRaydiumSwap(false, tokenAddress, amount);
 });
