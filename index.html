@@ -4,31 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meme Coin Trading on Solana</title>
+    <!-- Solana Web3.js -->
     <script src="https://unpkg.com/@solana/web3.js@1.100.0/lib/index.iife.js"></script>
-    <script>
-        window.addEventListener('load', async () => {
-            if (window.solana) {
-                const provider = window.solana;
-                try {
-                    const response = await provider.connect();
-                    const publicKey = response.publicKey.toString();
-                    document.getElementById('walletInfo').innerText = `Connected to wallet: ${publicKey}`;
-                    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-                    const balance = await connection.getBalance(new solanaWeb3.PublicKey(publicKey));
-                    document.getElementById('balance').innerText = `SOL Balance: ${(balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
-                } catch (err) {
-                    console.error(err);
-                }
-            } else {
-                document.getElementById('walletInfo').innerText = 'No Solana wallet found';
-            }
-        });
-    </script>
+    <!-- Raydium SDK -->
+    <script src="https://unpkg.com/@raydium-io/raydium-sdk@1.3.1-beta.58/dist/index.umd.js"></script>
+    <!-- Eigene JavaScript-Datei -->
+    <script src="app.js" defer></script>
 </head>
 <body>
     <h1>Meme Coin Trading</h1>
     <button id="connectWallet">Connect Wallet</button>
     <div id="walletInfo"></div>
-    <div id="balance"></div>
+    <h2>Token-Liste</h2>
+    <div id="tokenList"></div>
+    <h2>Handelsbereich</h2>
+    <div id="tradingArea"></div>
 </body>
 </html>
