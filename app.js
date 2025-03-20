@@ -14,7 +14,7 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
 
     if (!window.SolanaWeb3) {
         document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Überprüfe den CDN-Link oder die Konsole!';
-        console.error('SolanaWeb3 nicht definiert. CDN-Link:', 'https://unpkg.com/@solana/web3.js@1.100.0/lib/index.iife.js');
+        console.error('SolanaWeb3 nicht definiert. Lokale Datei:', 'solana-web3.js');
         console.log('Verfügbare globale Objekte:', Object.keys(window));
         return;
     }
