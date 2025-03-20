@@ -1,5 +1,5 @@
 // Debugging: Prüfe, ob SolanaWeb3 verfügbar ist
-console.log('SolanaWeb3 verfügbar:', typeof window.SolanaWeb3);
+console.log('Prüfe SolanaWeb3:', window.SolanaWeb3);
 
 // Globale Variablen
 let walletConnected = false;
@@ -13,8 +13,9 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
     }
 
     if (!window.SolanaWeb3) {
-        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Überprüfe den CDN-Link!';
+        document.getElementById('walletInfo').innerText = 'SolanaWeb3-Bibliothek nicht geladen. Überprüfe den CDN-Link oder die Konsole!';
         console.error('SolanaWeb3 nicht definiert. CDN-Link:', 'https://unpkg.com/@solana/web3.js@1.100.0/lib/index.iife.js');
+        console.log('Verfügbare globale Objekte:', Object.keys(window));
         return;
     }
 
@@ -25,9 +26,9 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
         document.getElementById('walletInfo').innerText = `Verbunden mit Wallet: ${publicKey}`;
         walletConnected = true;
 
-        connection = new SolanaWeb3.Connection(SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-        const balance = await connection.getBalance(new SolanaWeb3.PublicKey(publicKey));
-        document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / SolanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
+        connection = new window.SolanaWeb3.Connection(window.SolanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+        const balance = await connection.getBalance(new window.SolanaWeb3.PublicKey(publicKey));
+        document.getElementById('balance').innerText = `SOL-Guthaben: ${(balance / window.SolanaWeb3.LAMPORTS_PER_SOL).toFixed(2)}`;
     } catch (err) {
         console.error('Wallet-Verbindungsfehler:', err);
         document.getElementById('walletInfo').innerText = `Fehler bei der Wallet-Verbindung: ${err.message}`;
